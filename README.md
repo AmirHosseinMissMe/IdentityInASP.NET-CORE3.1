@@ -1,4 +1,4 @@
-# SimpleAuthenticationInCSharp
+# Authenticatio and Autherization in ASP.NET CORE 3.1
 This an full authentication system in ASP.NET Core3.1.
 
 Here I used Identity framework.
@@ -26,6 +26,8 @@ Here I used Identity framework.
 * Translated Error
 
 * Remote Validation and some Security points about that
+
+* Google login
 
 ### What to do?
 
