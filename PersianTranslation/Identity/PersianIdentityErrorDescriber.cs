@@ -8,35 +8,35 @@ namespace PersianTranslation.Identity
             => new IdentityError()
             {
                 Code = nameof(DuplicateEmail),
-                Description = $"ایمیل '{email}' قبلا توسط شخص دیگری انتخاب شده است"
+                Description = $"توسط شخص دیگری انتخاب شده است '{email}' ایمیل"
             };
 
         public override IdentityError DuplicateUserName(string userName)
             => new IdentityError()
             {
                 Code = nameof(DuplicateUserName),
-                Description = $"نام کاربری {userName} قبلا توسط شخص دیگری انتخاب شده است"
+                Description = $"توسط شخص دیگری انتخاب شده است '{userName}' نام کاربری"
             };
 
         public override IdentityError InvalidEmail(string email)
             => new IdentityError()
             {
                 Code = nameof(InvalidEmail),
-                Description = $"ایمیل '{email}' ، یک ایمیل معتبر نیست"
+                Description = $"یک ایمیل معتبر نیست '{email}' ایمیل"
             };
 
         public override IdentityError DuplicateRoleName(string role)
             => new IdentityError()
             {
                 Code = nameof(DuplicateRoleName),
-                Description = $"مقام '{role}' قبلا ثبت شده است"
+                Description = $"قبلا ثبت شده است '{role}' مقام"
             };
 
         public override IdentityError InvalidRoleName(string role)
             => new IdentityError()
             {
                 Code = nameof(InvalidRoleName),
-                Description = $"نام '{role}' معتبر نیست"
+                Description = $"معتبر نیست '{role}' نام"
             };
 
         public override IdentityError PasswordRequiresDigit()
@@ -71,42 +71,91 @@ namespace PersianTranslation.Identity
             => new IdentityError()
             {
                 Code = nameof(PasswordRequiresUniqueChars),
-                Description = $"رمز عبور باید حداقل دارای {uniqueChars} کاراکتر منحصر به فرد باشد"
+                Description = $"کاراکتر منحصر به فرد باشد {uniqueChars} رمز عبور باید حداقل دارای"
             };
 
         public override IdentityError PasswordTooShort(int length)
             => new IdentityError()
             {
                 Code = nameof(PasswordTooShort),
-                Description = $"رمز عبور نباید کمتر از {length} کاراکتر باشد"
+                Description = $"کاراکتر باشد {length} رمز عبور نباید کمتر از"
             };
 
         public override IdentityError InvalidUserName(string userName)
             => new IdentityError()
             {
                 Code = nameof(InvalidUserName),
-                Description = $"نام کاربری '{userName}' معتبر نیست، نام کاربری فقط میتواند دارای حروف یا عدد باشد"
+                Description = $"معتبر نیست '{userName}' نام کاربری"
             };
 
         public override IdentityError UserNotInRole(string role)
             => new IdentityError()
             {
                 Code = nameof(UserNotInRole),
-                Description = $"کاربر در مقام '{role}' نیست"
+                Description = $"نیست '{role}' کاربر مورد نظر در مقام"
             };
 
         public override IdentityError UserAlreadyInRole(string role)
             => new IdentityError()
             {
                 Code = nameof(UserAlreadyInRole),
-                Description = $"کاربر در مقام '{role}' است"
+                Description = $"است '{role}' کاربر مورد نظر در مقام"
             };
 
         public override IdentityError DefaultError()
             => new IdentityError()
             {
                 Code = nameof(DefaultError),
-                Description = $"خطای پیشبینی نشده رخ داد"
+                Description = "خطای پیشبینی نشده رخ داد"
+            };
+
+        public override IdentityError ConcurrencyFailure()
+            => new IdentityError()
+            {
+                Code = nameof(ConcurrencyFailure),
+                Description = "خطای همزمانی رخ داد"
+            };
+
+        public override IdentityError InvalidToken()
+            => new IdentityError()
+            {
+                Code = nameof(InvalidToken),
+                Description = "توکن معتبر نیست"
+            };
+
+        public override IdentityError RecoveryCodeRedemptionFailed()
+            => new IdentityError()
+            {
+                Code = nameof(RecoveryCodeRedemptionFailed),
+                Description = "کد بازیابی معتبر نیست"
+            };
+
+        public override IdentityError UserLockoutNotEnabled()
+            => new IdentityError()
+            {
+                Code = nameof(UserLockoutNotEnabled),
+                Description = "قابلیت قفل اکانت کاربر فعال نیست"
+            };
+
+        public override IdentityError UserAlreadyHasPassword()
+            => new IdentityError()
+            {
+                Code = nameof(UserAlreadyHasPassword),
+                Description = "کاربر از قبل رمزعبور دارد"
+            };
+
+        public override IdentityError PasswordMismatch()
+            => new IdentityError()
+            {
+                Code = nameof(PasswordMismatch),
+                Description = "عدم تطابق رمزعبور"
+            };
+
+        public override IdentityError LoginAlreadyAssociated()
+            => new IdentityError()
+            {
+                Code = nameof(LoginAlreadyAssociated),
+                Description = "از قبل اکانت خارجی به حساب این کاربر متصل اصت"
             };
     }
 }
