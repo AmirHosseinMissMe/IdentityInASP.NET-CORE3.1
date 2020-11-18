@@ -35,6 +35,8 @@ Here I used Identity framework.
 
 * Role-based Authorization
 
+* Claim-based Authorization
+
 ### What to do?
 
 If you want to use it on your system, you can easily use VisualStudio to compile and  run the project.
