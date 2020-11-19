@@ -3,6 +3,7 @@ using IdentitySample.Models.Context;
 using IdentitySample.Repositories;
 using IdentitySample.Security.Default;
 using IdentitySample.Security.DynamicRole;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -56,6 +57,19 @@ namespace IdentitySample
                 .AddDefaultTokenProviders()
                 .AddErrorDescriber<PersianIdentityErrorDescriber>();
 
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.AccessDeniedPath = "/Account/AccessDenied";
+                //options.Cookie.Name = "IdentityProj";
+                options.LoginPath = "/Account/Login";
+                options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
+            });
+
+            services.Configure<SecurityStampValidatorOptions>(option =>
+            {
+                // option.ValidationInterval = TimeSpan.FromSeconds(15);
+            });
+
             services.AddAuthorization(option =>
             {
                 option.AddPolicy("EmployeeListPolicy", policy => policy
@@ -64,9 +78,9 @@ namespace IdentitySample
                 option.AddPolicy("ClaimOrRole", policy =>
                      policy.RequireAssertion(ClaimOrRole));
 
-                option.AddPolicy("ClaimRequirement",policy=>
-                    policy.Requirements.Add(new ClaimRequirement(ClaimTypesStore.EmployeeList,true.ToString())));
-               
+                option.AddPolicy("ClaimRequirement", policy =>
+                     policy.Requirements.Add(new ClaimRequirement(ClaimTypesStore.EmployeeList, true.ToString())));
+
                 option.AddPolicy("DynamicRole", policy =>
                     policy.Requirements.Add(new DynamicRoleRequirement()));
             });
@@ -110,7 +124,7 @@ namespace IdentitySample
 
 
         private bool ClaimOrRole(AuthorizationHandlerContext context)
-            => context.User.HasClaim(ClaimTypesStore.EmployeeList, true.ToString()) || 
+            => context.User.HasClaim(ClaimTypesStore.EmployeeList, true.ToString()) ||
                context.User.IsInRole("Admin");
 
     }

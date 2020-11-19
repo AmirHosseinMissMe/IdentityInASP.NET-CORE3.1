@@ -48,14 +48,7 @@ namespace IdentitySample.Security.DynamicRole
                 return _utilities.DataBaseRoleValidationGuid();
             });
 
-            var allAreasName = _memoryCache.GetOrCreate("allAreasName", p =>
-            {
-                p.AbsoluteExpiration = DateTimeOffset.MaxValue;
-                return _utilities.GetAllAreasNames();
-            });
-
-            SplitUserRequestedUrl(httpContext.Request.Path.ToString(), allAreasName,
-                out var areaAndActionAndControllerName);
+            SplitUserRequestedUrl(httpContext, out var areaAndActionAndControllerName);
 
             UnprotectRvgCookieData(httpContext, out var unprotectedRvgCookie);
 
@@ -85,28 +78,12 @@ namespace IdentitySample.Security.DynamicRole
 
         #region Methods
 
-        private void SplitUserRequestedUrl(string url, IList<string> areaNames,
-            out string areaAndControllerAndActionName)
+        private void SplitUserRequestedUrl(HttpContext httpContext, out string areaAndControllerAndActionName)
         {
-            var requestedUrl = url.Split('/')
-                .Where(t => !string.IsNullOrEmpty(t)).ToList();
-            var urlCount = requestedUrl.Count;
-            if (urlCount != 0 &&
-                areaNames.Any(t => t.Equals(requestedUrl[0], StringComparison.CurrentCultureIgnoreCase)))
-            {
-                var areaName = requestedUrl[0];
-                var controllerName = (urlCount == 1) ? "HomeController" : requestedUrl[1] + "Controller";
-                var actionName = (urlCount > 2) ? requestedUrl[2] : "Index";
-                areaAndControllerAndActionName = $"{areaName}|{controllerName}|{actionName}".ToUpper();
-            }
-            else
-            {
-                var areaName = "NoArea";
-                var controllerName = (urlCount == 0) ? "HomeController" : requestedUrl[0] + "Controller";
-                var actionName = (urlCount > 1) ? requestedUrl[1] : "Index";
-                areaAndControllerAndActionName = $"{areaName}|{controllerName}|{actionName}".ToUpper();
-            }
-
+            var areaName = httpContext.Request.RouteValues["area"]?.ToString() ?? "NoArea";
+            var controllerName = httpContext.Request.RouteValues["controller"].ToString() + "Controller";
+            var actionName = httpContext.Request.RouteValues["action"].ToString();
+            areaAndControllerAndActionName = $"{areaName}|{controllerName}|{actionName}".ToUpper();
         }
 
         private void UnprotectRvgCookieData(HttpContext httpContext, out string unprotectedRvgCookie)

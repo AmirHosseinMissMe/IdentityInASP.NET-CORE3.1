@@ -122,6 +122,7 @@ namespace IdentitySample.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogOut()
         {
+            // HttpContext.Response.Cookies.Delete("RVG");
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }

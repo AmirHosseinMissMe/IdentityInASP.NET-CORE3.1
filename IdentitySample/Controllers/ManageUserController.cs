@@ -225,5 +225,15 @@ namespace IdentitySample.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> UpdateSecurityStamp(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return NotFound();
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+            await _userManager.UpdateSecurityStampAsync(user);
+            return RedirectToAction("Index");
+        }
+
     }
 }
