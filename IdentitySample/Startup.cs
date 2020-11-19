@@ -53,6 +53,15 @@ namespace IdentitySample
                 .AddDefaultTokenProviders()
                 .AddErrorDescriber<PersianIdentityErrorDescriber>();
 
+            services.AddAuthorization(option =>
+            {
+                option.AddPolicy("EmployeeListPolicy",
+                    policy=>policy
+                        .RequireClaim(ClaimTypesStore.EmployeeList, false.ToString(), true.ToString()));
+            });
+
+
+
             services.AddScoped<IMessageSender, MessageSender>();
         }
 

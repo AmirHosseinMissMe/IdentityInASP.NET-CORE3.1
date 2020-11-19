@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace IdentitySample.Controllers
 {
     //[Authorize(Roles = "Owner")]
-    [AllowAnonymous]
+    //[AllowAnonymous]
     public class EmployeeController : Controller
     {
         private readonly AppDbContext _context;
@@ -24,7 +24,8 @@ namespace IdentitySample.Controllers
 
         // GET: Employee
         //[AllowAnonymous]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
+        [Authorize(Policy = "EmployeeListPolicy")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Employees.ToListAsync());
