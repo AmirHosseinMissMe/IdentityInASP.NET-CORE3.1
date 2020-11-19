@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using IdentitySample.Models;
 using IdentitySample.Models.Context;
 using IdentitySample.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -21,11 +22,11 @@ namespace IdentitySample.Security.DynamicRole
         private readonly IUtilities _utilities;
         private readonly IMemoryCache _memoryCache;
         private readonly IDataProtector _protectorToken;
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly AppDbContext _dbContext;
 
-        public DynamicRoleHandler(IHttpContextAccessor contextAccessor, IUtilities utilities, IMemoryCache memoryCache, IDataProtectionProvider dataProtectionProvider, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, AppDbContext appDbContext)
+        public DynamicRoleHandler(IHttpContextAccessor contextAccessor, IUtilities utilities, IMemoryCache memoryCache, IDataProtectionProvider dataProtectionProvider, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, AppDbContext appDbContext)
         {
             _contextAccessor = contextAccessor;
             _utilities = utilities;

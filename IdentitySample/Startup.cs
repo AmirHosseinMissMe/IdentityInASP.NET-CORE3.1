@@ -1,4 +1,5 @@
 using System;
+using IdentitySample.Models;
 using IdentitySample.Models.Context;
 using IdentitySample.Repositories;
 using IdentitySample.Security.Default;
@@ -43,7 +44,7 @@ namespace IdentitySample
                     options.ClientSecret = "W_xZMX7Mz1hwHcgL-J8eST7A";
                 });
 
-            services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
                 {
                     options.Password.RequiredUniqueChars = 0;
 

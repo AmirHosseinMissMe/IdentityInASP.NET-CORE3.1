@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using IdentitySample.Models;
 using IdentitySample.Repositories;
 using IdentitySample.ViewModels.Account;
 using Microsoft.AspNetCore.Identity;
@@ -12,12 +13,12 @@ namespace IdentitySample.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IMessageSender _messageSender;
 
-        public AccountController(UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager, IMessageSender messageSender)
+        public AccountController(UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager, IMessageSender messageSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -36,10 +37,11 @@ namespace IdentitySample.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser()
+                var user = new ApplicationUser()
                 {
                     UserName = model.UserName,
-                    Email = model.Email
+                    Email = model.Email,
+                    City = "Tehran"
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
@@ -207,12 +209,13 @@ namespace IdentitySample.Controllers
                 var user = await _userManager.FindByEmailAsync(email);
                 if (user == null)
                 {
-                    var userName = email.Split('@')[0];
-                    user = new IdentityUser()
+                    var userName = email.Split('@')[0].Split('.')[0];
+                    user = new ApplicationUser()
                     {
                         UserName = (userName.Length <= 10 ? userName : userName.Substring(0, 10)),
                         Email = email,
-                        EmailConfirmed = true
+                        EmailConfirmed = true,
+                        City =  "Tehran"
                     };
 
                     await _userManager.CreateAsync(user);
