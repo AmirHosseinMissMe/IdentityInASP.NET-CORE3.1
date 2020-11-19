@@ -19,7 +19,7 @@ namespace IdentitySample.Repositories
             _dbContext = dbContext;
         }
 
-        public IList<ActionAndControllerName> ActionAndControllerNamesList()
+        public IList<ActionAndControllerName> AreaAndActionAndControllerNamesList()
         {
             Assembly asm = Assembly.GetExecutingAssembly();
             var contradistinction = asm.GetTypes()
