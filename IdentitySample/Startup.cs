@@ -68,7 +68,7 @@ namespace IdentitySample
 
             });
 
-
+            services.AddMemoryCache();
             services.AddScoped<IMessageSender, MessageSender>();
             services.AddSingleton<IAuthorizationHandler, ClaimHandler>();
         }
