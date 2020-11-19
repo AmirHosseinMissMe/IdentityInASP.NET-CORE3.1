@@ -2,6 +2,7 @@ using System;
 using IdentitySample.Models.Context;
 using IdentitySample.Repositories;
 using IdentitySample.Security.Default;
+using IdentitySample.Security.DynamicRole;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -65,12 +66,16 @@ namespace IdentitySample
 
                 option.AddPolicy("ClaimRequirement",policy=>
                     policy.Requirements.Add(new ClaimRequirement(ClaimTypesStore.EmployeeList,true.ToString())));
-
+               
+                option.AddPolicy("DynamicRole", policy =>
+                    policy.Requirements.Add(new DynamicRoleRequirement()));
             });
 
             services.AddMemoryCache();
+            services.AddHttpContextAccessor();
             services.AddTransient<IUtilities, Utilities>();
             services.AddScoped<IMessageSender, MessageSender>();
+            services.AddScoped<IAuthorizationHandler, DynamicRoleHandler>();
             services.AddSingleton<IAuthorizationHandler, ClaimHandler>();
         }
 

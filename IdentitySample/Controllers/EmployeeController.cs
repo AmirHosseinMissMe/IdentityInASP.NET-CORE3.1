@@ -13,6 +13,7 @@ namespace IdentitySample.Controllers
 {
     //[Authorize(Roles = "Owner")]
     //[AllowAnonymous]
+    [Authorize(Policy = "DynamicRole")]
     public class EmployeeController : Controller
     {
         private readonly AppDbContext _context;
@@ -27,7 +28,7 @@ namespace IdentitySample.Controllers
         //[Authorize(Roles = "Admin")]
         //[Authorize(Policy = "EmployeeListPolicy")]
         // [Authorize(Policy = "ClaimOrRole")]
-        [Authorize(Policy = "ClaimRequirement")]
+        //[Authorize(Policy = "ClaimRequirement")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Employees.ToListAsync());
