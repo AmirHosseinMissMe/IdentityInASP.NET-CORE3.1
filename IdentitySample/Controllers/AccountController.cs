@@ -170,10 +170,11 @@ namespace IdentitySample.Controllers
             return new ChallengeResult(provider, properties);
         }
 
+        [HttpGet]
         public async Task<IActionResult> ExternalLoginCallBack(string returnUrl = null, string remoteError = null)
         {
-            returnUrl =
-                (returnUrl != null && Url.IsLocalUrl(returnUrl)) ? returnUrl : Url.Content("~/");
+            ViewData["returnUrl"] = returnUrl;
+            returnUrl = (returnUrl != null && Url.IsLocalUrl(returnUrl)) ? returnUrl : Url.Content("~/");
 
             var loginViewModel = new LoginViewModel()
             {
@@ -207,19 +208,7 @@ namespace IdentitySample.Controllers
             if (email != null)
             {
                 var user = await _userManager.FindByEmailAsync(email);
-                if (user == null)
-                {
-                    var userName = email.Split('@')[0].Split('.')[0];
-                    user = new ApplicationUser()
-                    {
-                        UserName = (userName.Length <= 10 ? userName : userName.Substring(0, 10)),
-                        Email = email,
-                        EmailConfirmed = true,
-                        City =  "Tehran"
-                    };
-
-                    await _userManager.CreateAsync(user);
-                }
+                if (user == null) return View();
 
                 await _userManager.AddLoginAsync(user, externalLoginInfo);
                 await _signInManager.SignInAsync(user, false);
@@ -227,9 +216,66 @@ namespace IdentitySample.Controllers
                 return Redirect(returnUrl);
             }
 
-            ViewBag.ErrorTitle = "لطفا با بخش پشتیبانی تماس بگیرید";
-            ViewBag.ErrorMessage = $"دریافت کرد {externalLoginInfo.LoginProvider} نمیتوان اطلاعاتی از";
-            return View();
+            ViewData["ErrorMessage"] = $"دریافت کرد {externalLoginInfo.LoginProvider} نمیتوان اطلاعاتی از";
+            return View("Login", loginViewModel);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ExternalLoginCallBack(ExternalLoginCallBackViewModel model, string returnUrl = null)
+        {
+            if (ModelState.IsValid)
+            {
+                var loginViewModel = new LoginViewModel()
+                {
+                    ReturnUrl = returnUrl,
+                    ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+                };
+
+                var externalLoginInfo = await _signInManager.GetExternalLoginInfoAsync();
+                if (externalLoginInfo?.Principal.FindFirstValue(ClaimTypes.Email) == null)
+                {
+                    ModelState.AddModelError("ErrorLoadingExternalLoginInfo", $"مشکلی پیش آمد");
+                    return View("Login", loginViewModel);
+                }
+
+                var email = externalLoginInfo.Principal.FindFirstValue(ClaimTypes.Email);
+
+                var user = await _userManager.FindByEmailAsync(email);
+                var result = new IdentityResult();
+                if (user == null)
+                {
+                    user = new ApplicationUser()
+                    {
+                        Email = email,
+                        UserName = model.UserName,
+                        EmailConfirmed = true
+                    };
+
+                    if (!string.IsNullOrWhiteSpace(model.Password))
+                        result = await _userManager.CreateAsync(user, model.Password);
+                    else
+                        result = await _userManager.CreateAsync(user);
+                }
+
+                if (result.Succeeded)
+                {
+                    await _userManager.AddLoginAsync(user, externalLoginInfo);
+                    await _signInManager.SignInAsync(user, false);
+
+                    if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                        return Redirect(returnUrl);
+
+                    return RedirectToAction("Index", "Home");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("",error.Description);
+                }
+            }
+
+            return View(model);
         }
 
     }
