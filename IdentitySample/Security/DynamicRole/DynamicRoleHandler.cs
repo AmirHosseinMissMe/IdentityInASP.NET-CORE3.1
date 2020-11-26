@@ -89,8 +89,9 @@ namespace IdentitySample.Security.DynamicRole
 
         private void UnprotectRvgCookieData(HttpContext httpContext, out string unprotectedRvgCookie)
         {
-            var protectedRvgCookie = httpContext.Request.Cookies
-                .FirstOrDefault(t => t.Key == "RVG").Value;
+            //var protectedRvgCookie = httpContext.Request.Cookies
+            //    .FirstOrDefault(t => t.Key == "RVG").Value;
+            var protectedRvgCookie = httpContext.Request.Cookies["RVG"];
             unprotectedRvgCookie = null;
             if (!string.IsNullOrEmpty(protectedRvgCookie))
             {
