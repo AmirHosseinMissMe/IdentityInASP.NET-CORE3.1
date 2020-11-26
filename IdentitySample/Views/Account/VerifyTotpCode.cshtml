@@ -1,0 +1,27 @@
+﻿@model VerifyTotpCodeViewModel
+
+@{
+    ViewData["Title"] = "Login by totp code";
+}
+
+<h1>Login</h1>
+
+<div>
+    <form asp-controller="Account" asp-action="VerifyTotpCode" method="post">
+        <div asp-validation-summary="ModelOnly"></div>
+
+        <label asp-for="TotpCode" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="TotpCode" class="form-control" />
+            <span asp-validation-for="TotpCode" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">ورود</button>
+    </form>
+</div>
+
+
+@section Scripts
+{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

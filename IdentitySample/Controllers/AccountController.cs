@@ -107,11 +107,23 @@ namespace IdentitySample.Controllers
 
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(
-                    model.UserName, model.Password, model.RememberMe, true);
+                //var result = await _signInManager.PasswordSignInAsync(
+                //    model.UserName, model.Password, model.RememberMe, true);
 
+                var user = await _userManager.FindByNameAsync(model.UserName);
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "رمزعبور یا نام کاربری اشتباه است");
+                    return View(model);
+                }
+
+                var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, true);
                 if (result.Succeeded)
                 {
+                    await _signInManager.SignInWithClaimsAsync(user, model.RememberMe, new List<Claim>()
+                    {
+                        new Claim("UserCity",user.City ?? "")
+                    });
                     if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                         return Redirect(returnUrl);
 
@@ -404,7 +416,7 @@ namespace IdentitySample.Controllers
 
                 var secretKey = Guid.NewGuid().ToString();
                 var totpCode = _phoneTotpProvider.GenerateTotp(secretKey);
-               
+
                 var userExists = await _userManager.Users
                     .AnyAsync(user => user.PhoneNumber == model.PhoneNumber);
                 if (userExists)
@@ -430,8 +442,77 @@ namespace IdentitySample.Controllers
         public IActionResult VerifyTotpCode()
         {
             if (_signInManager.IsSignedIn(User)) return RedirectToAction("Index", "Home");
+            if (!TempData.ContainsKey("PTC")) return NotFound();
 
+            var totpTempDataModel = JsonSerializer.Deserialize<PhoneTotpTempDataModel>(TempData["PTC"].ToString()!);
+            if (totpTempDataModel.ExpirationTime <= DateTime.Now)
+            {
+                TempData["SendTotpCodeErrorMessage"] = "کد ارسال شده منقضی شده، لطفا کد جدیدی دریافت کنید.";
+                return RedirectToAction("SendTotpCode");
+            }
+
+            TempData.Keep("PTC");
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyTotpCode(VerifyTotpCodeViewModel model)
+        {
+            if (_signInManager.IsSignedIn(User)) return RedirectToAction("Index", "Home");
+            if (!TempData.ContainsKey("PTC")) return NotFound();
+            if (ModelState.IsValid)
+            {
+                var totpTempDataModel = JsonSerializer.Deserialize<PhoneTotpTempDataModel>(TempData["PTC"].ToString()!);
+                if (totpTempDataModel.ExpirationTime <= DateTime.Now)
+                {
+                    TempData["SendTotpCodeErrorMessage"] = "کد ارسال شده منقضی شده، لطفا کد جدیدی دریافت کنید.";
+                    return RedirectToAction("SendTotpCode");
+                }
+
+                var user = await _userManager.Users
+                    .Where(u => u.PhoneNumber == totpTempDataModel.PhoneNumber)
+                    .FirstOrDefaultAsync();
+
+                var result = _phoneTotpProvider.VerifyTotp(totpTempDataModel.SecretKey, model.TotpCode);
+                if (result.Succeeded)
+                {
+                    if (user == null)
+                    {
+                        TempData["SendTotpCodeErrorMessage"] = "کاربری با شماره موبایل وارد شده یافت نشد.";
+                        return RedirectToAction("SendTotpCode");
+                    }
+
+                    if (!user.PhoneNumberConfirmed)
+                    {
+                        TempData["SendTotpCodeErrorMessage"] = "شماره موبایل شما تایید نشده است.";
+                        return RedirectToAction("SendTotpCode");
+                    }
+
+                    if (!await _userManager.IsLockedOutAsync(user))
+                    {
+                        await _userManager.ResetAccessFailedCountAsync(user);
+                        await _signInManager.SignInWithClaimsAsync(user, false, new List<Claim>()
+                        {
+                            new Claim("UserCity",user.City ?? "")
+                        });
+
+                        return RedirectToAction("Index", "Home");
+                    }
+
+                    TempData["SendTotpCodeErrorMessage"] = "اکانت شما به دلیل ورود ناموفق تا مدت زمان معینی قفل شده است.";
+                    return RedirectToAction("SendTotpCode");
+                }
+
+                if (user != null && user.PhoneNumberConfirmed && !await _userManager.IsLockedOutAsync(user))
+                {
+                    await _userManager.AccessFailedAsync(user);
+                }
+
+                TempData["SendTotpCodeErrorMessage"] = "کد ارسال شده معتبر نمی باشد، لطفا کد جدیدی دریافت کنید.";
+                return RedirectToAction("SendTotpCode");
+            }
+
+            return View(model);
         }
     }
 }
