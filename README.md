@@ -41,6 +41,10 @@ Here I used Identity framework.
 
 * Dynamic Authorization
 
+* Phone verifying
+
+* Forgot password
+
 ### What to do?
 
 If you want to use it on your system, you can easily use VisualStudio to compile and  run the project.
